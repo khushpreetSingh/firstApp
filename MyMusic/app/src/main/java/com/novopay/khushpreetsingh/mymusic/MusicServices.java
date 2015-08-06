@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 
+import java.io.Serializable;
+
 import Events.MusicCompletedEvent;
+import Events.SeekbarUpdateEvent;
 import de.greenrobot.event.EventBus;
 import hugo.weaving.DebugLog;
 
@@ -23,19 +26,13 @@ public class MusicServices extends Service{
     public static final String METHOD_FF = "method_ff";
     public static final String METHOD_STOP = "method_stop";
 
-    public static int getCurrentPosition(){
-        if(mediaPlayer!=null){
-            if(mediaPlayer.isPlaying()) {
-                return mediaPlayer.getCurrentPosition();
-            }
-        }
-        return -1;
-    }
 
 
     @Override
     @DebugLog
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(intent==null)
+            return super.onStartCommand(intent, flags, startId);
         String method = intent.getStringExtra(KEY_METHOD);
         mediaPlayer=MediaPlayer.create(this, R.raw.a);
         if(method.equals(METHOD_PLAY))
@@ -48,11 +45,11 @@ public class MusicServices extends Service{
         }
         if(method.equals(METHOD_FF))
         {
-            fastforward();
+            fastForward();
         }
         if(method.equals(METHOD_REW))
         {
-            revind();
+            Revind();
         }
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -61,6 +58,7 @@ public class MusicServices extends Service{
                 EventBus.getDefault().post(new MusicCompletedEvent());
             }
         });
+
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -75,8 +73,11 @@ public class MusicServices extends Service{
 
     public static void startMusic(){
 
-        if(mediaPlayer!=null)
+        if(mediaPlayer!=null) {
             mediaPlayer.start();
+            EventBus.getDefault().post(new SeekbarUpdateEvent());
+
+        }
     }
 
     public static void pauseMusic(){
@@ -84,14 +85,14 @@ public class MusicServices extends Service{
                 mediaPlayer.pause();
     }
 
-    public static void fastforward(){
+    public static void fastForward(){
         if(mediaPlayer!=null)
         {
             mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 2000);
         }
     }
 
-    public static void revind(){
+    public static void Revind(){
         if(mediaPlayer!=null){
             mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 2000);
         }
@@ -99,6 +100,15 @@ public class MusicServices extends Service{
 
     public static int songDuration() {
         return mediaPlayer.getDuration();
+    }
+
+    public static int getCurrentPosition(){
+        if(mediaPlayer!=null){
+            if(mediaPlayer.isPlaying()) {
+                return mediaPlayer.getCurrentPosition();
+            }
+        }
+        return -1;
     }
 
     public static boolean isMusicPlaying(){
@@ -121,5 +131,7 @@ public class MusicServices extends Service{
     public String songName(){
         return this.songName();
     }
+
+
 
 }

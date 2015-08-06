@@ -1,5 +1,6 @@
 package com.novopay.khushpreetsingh.mymusic;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
@@ -9,21 +10,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.logging.Handler;
+import com.novopay.khushpreetsingh.mymusic.Models.MusicApiResponse;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import Events.MusicCompletedEvent;
+import Events.SeekbarUpdateEvent;
+import de.greenrobot.event.EventBus;
+import hugo.weaving.DebugLog;
 
 
 public class MusicActivity extends ActionBarActivity {
 
-    private Button mPlayButton;
-    private Button mPauseButton;
-    private Button mFastForward;
-    private Button mRewind;
+    private Button mPlayButton, mPauseButton,mFastForward,mRewind;
     private MediaPlayer mediaPlayer;
     private SeekBar mSeek;
-    public static int MESSAGE_SLEEP =11;
+    private TextView mSongName, mArtistName;
+    public int music_current_position;
+    public static int POS;
+
+    //******
     public static int MESSAGE_WAKE_UP=10;
+    // *******
 
     MusicHandler musicHandler = new MusicHandler();
 
@@ -33,19 +46,33 @@ public class MusicActivity extends ActionBarActivity {
         setContentView(R.layout.activity_music);
 
         mPlayButton = (Button) findViewById(R.id.activity_main_play);
+        mPlayButton.setVisibility(View.INVISIBLE);
         mPauseButton = (Button) findViewById(R.id.activity_main_pause);
+        mPauseButton.setVisibility(View.VISIBLE);
         mFastForward = (Button) findViewById(R.id.activity_main_fastforward);
         mRewind = (Button) findViewById(R.id.activity_main_rewind);
+        //music_current_position = MusicServices.getCurrentPosition();
         mSeek = (SeekBar) findViewById(R.id.activity_main_seek);
+        mSongName = (TextView) findViewById(R.id.main_songName);
+        mArtistName = (TextView) findViewById(R.id.main_artistName);
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.a);
+        Intent intent = getIntent();
+        if(intent!=null) {
+            MusicApiResponse musicResponse = (MusicApiResponse) intent.getSerializableExtra("MUSICLIST");
+            POS = (int) intent.getLongExtra("POS" ,-1);
+            mSongName.setText(musicResponse.getResults().getCollection1().get(POS).getSongName().getText());
+
+        }
+        if(MusicServices.isMusicPlaying())
+            musicHandler.sendEmptyMessage(MESSAGE_WAKE_UP);
+
 
         mPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayer.start();
-                musicHandler.sendEmptyMessage(MESSAGE_WAKE_UP);
-                //Toast.makeText(MusicActivity.this, "Play is Clicked", Toast.LENGTH_SHORT).show();
+                MusicServices.startMusic();
+                mPlayButton.setVisibility(View.INVISIBLE);
+                mPauseButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -53,39 +80,36 @@ public class MusicActivity extends ActionBarActivity {
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayer.pause();
-                musicHandler.sendEmptyMessage(MESSAGE_WAKE_UP);
-
-                //Toast.makeText(MusicActivity.this, "Pause is Clicked", Toast.LENGTH_SHORT).show();
+                MusicServices.pauseMusic();
+                mPlayButton.setVisibility(View.VISIBLE);
+                mPauseButton.setVisibility(View.INVISIBLE);
             }
         });
         mFastForward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5000);
+                MusicServices.fastForward();
             }
         });
 
         mRewind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 5000);
+                MusicServices.Revind();
             }
         });
 
-    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            Toast.makeText(MusicActivity.this, "Song is Complete", Toast.LENGTH_SHORT).show();
-        }
-    });
 
-    mSeek.setMax(mediaPlayer.getDuration());
+    mSeek.setMax(MusicServices.songDuration());
     mSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if(fromUser)
-                mediaPlayer.seekTo(progress);
+                MusicServices.seekMusicTo(progress,fromUser);
+            if(progress==100)
+            {
+                mPlayButton.setVisibility(View.VISIBLE);
+                mPauseButton.setVisibility(View.INVISIBLE);
+            }
         }
 
         @Override
@@ -129,14 +153,50 @@ public class MusicActivity extends ActionBarActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == MESSAGE_WAKE_UP) {
-                if (mediaPlayer != null) {
-                    if (mediaPlayer.isPlaying()) {
-                        mSeek.setProgress(mediaPlayer.getCurrentPosition());
+                if (MusicServices.isMusicPlaying()) {
+                        mSeek.setProgress(MusicServices.getCurrentPosition());
                         sendEmptyMessageDelayed(MESSAGE_WAKE_UP, 200);
-                    }
                 }
             }
             super.handleMessage(msg);
         }
+    }
+
+
+    @Override
+    protected void onStart() {
+        EventBus.getDefault().register(this);
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    public void onEvent(MusicCompletedEvent event) {
+        Toast.makeText(MusicActivity.this, "Song Ended", Toast.LENGTH_SHORT).show();
+        mPlayButton.setVisibility(View.VISIBLE);
+        mPauseButton.setVisibility(View.INVISIBLE);
+    };
+
+    @DebugLog
+    public void onEvent(SeekbarUpdateEvent event){
+        musicHandler.sendEmptyMessage(MESSAGE_WAKE_UP);
     }
 }

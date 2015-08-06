@@ -1,38 +1,93 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MusicActivity">
-
-    <Button
-        android:id="@+id/activity_main_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/play"/>
-    <Button
-        android:id="@+id/activity_main_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/pause"/>
-    <Button
-        android:id="@+id/activity_main_fastforward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/fastforwad"/>
-    <Button
-        android:id="@+id/activity_main_rewind"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/rewind"/>
-    <SeekBar
-        android:id="@+id/activity_main_seek"
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context=".MainActivity">
 
-</LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/display_image"
+            android:src="@drawable/thumb"
+            android:maxWidth="350dp"
+            android:maxHeight="350dp"
+            android:layout_centerHorizontal="true"
+            android:adjustViewBounds="true"
+            />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_songName"
+            android:layout_alignBottom="@+id/display_image"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/display_image"
+            android:paddingTop="5dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_artistName"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/main_songName"
+            android:paddingTop="5dp"
+            />
+
+
+        <Button
+            android:id="@+id/activity_main_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:layout_toRightOf="@+id/activity_main_rewind"
+            android:layout_below="@+id/activity_main_seek"
+            android:text="Play"
+
+            />
+
+
+        <Button
+            android:id="@+id/activity_main_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pause"
+            android:layout_toRightOf="@+id/activity_main_play"
+            android:layout_below="@+id/activity_main_seek" />
+
+        <Button
+            android:id="@+id/activity_main_fastforward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FF"
+            android:paddingLeft="8dp"
+            android:layout_toRightOf="@+id/activity_main_pause"
+            android:layout_below="@+id/activity_main_seek" />
+
+        <Button
+            android:id="@+id/activity_main_rewind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RR"
+            android:paddingRight="8dp"
+            android:layout_below="@+id/activity_main_seek"/>
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/activity_main_seek"
+            android:layout_below="@+id/main_songName"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="23dp"/>
+
+
+    </RelativeLayout>
+
+
+
+

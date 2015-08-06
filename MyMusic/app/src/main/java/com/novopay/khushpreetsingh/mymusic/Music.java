@@ -2,11 +2,14 @@ package com.novopay.khushpreetsingh.mymusic;
 
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 
 /**
  * Created by khushpreetsingh on 8/4/15.
  */
-public class Music {
+public class Music implements Serializable{
     private String songName;
     private String albumName;
     private String singerName;

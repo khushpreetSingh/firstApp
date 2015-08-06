@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,16 +39,17 @@ public class SecondFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.second_fragment, container, false);
         gridView = (GridView)  view.findViewById(R.id.gridview);
-        musicAdapter = new MusicAdapter(getActivity(), musicList);
+        /*musicAdapter = new MusicAdapter(getActivity(), musicList);
         gridView.setAdapter(musicAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(),MusicActivity.class);
+                intent.putExtra("music",(Serializable)musicList);
                 startActivity(intent);
             }
-        });
+        });*/
         return view;
     }
 

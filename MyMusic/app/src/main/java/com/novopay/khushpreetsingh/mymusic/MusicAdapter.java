@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import android.app.Activity;
 
+import com.novopay.khushpreetsingh.mymusic.Models.Collection1;
+import com.novopay.khushpreetsingh.mymusic.Models.MusicApiResponse;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
@@ -21,8 +23,8 @@ import java.util.List;
  */
 public class MusicAdapter extends BaseAdapter {
     WeakReference<Context> contextWeakReference;
-    List<Music> musicList;
-    public MusicAdapter(Context context, List<Music> musicList) {
+    List<Collection1> musicList;
+    public MusicAdapter(Context context, List<Collection1> musicList) {
         this.contextWeakReference = new WeakReference<Context>(context);
         this.musicList = musicList;
 
@@ -34,7 +36,7 @@ public class MusicAdapter extends BaseAdapter {
     }
 
     @Override
-    public Music getItem(int position) {
+    public Collection1 getItem(int position) {
         return musicList.get(position);
     }
 
@@ -72,12 +74,12 @@ public class MusicAdapter extends BaseAdapter {
         viewHolder = (ViewHolder) view.getTag();
     }
 
-        Music music = getItem(position);
+        Collection1 music = getItem(position);
 
-        viewHolder.albumView.setText(music.getAlbumName());
-        viewHolder.artistView.setText(music.getSingerName());
-        viewHolder.songView.setText(music.getSongName());
-        Picasso.with(contextWeakReference.get()).load(music.getImageUrl()).error(R.drawable.thumb).into(viewHolder.imageView);
+        viewHolder.albumView.setText(music.getSongName().getText());
+        viewHolder.artistView.setText(music.getArtistName().getText());
+        viewHolder.songView.setText(music.getSongName().getText());
+        Picasso.with(contextWeakReference.get()).load(music.getImageUrl().getSrc()).error(R.drawable.thumb).into(viewHolder.imageView);
 
 
 
