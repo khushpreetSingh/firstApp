@@ -4,10 +4,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.io.Serializable;
 
 import Events.MusicCompletedEvent;
+import Events.MusicPlayEvent;
 import Events.SeekbarUpdateEvent;
 import de.greenrobot.event.EventBus;
 import hugo.weaving.DebugLog;
@@ -34,10 +37,18 @@ public class MusicServices extends Service{
         if(intent==null)
             return super.onStartCommand(intent, flags, startId);
         String method = intent.getStringExtra(KEY_METHOD);
+        /*String song = intent.getStringExtra("SONG");
+        String album = intent.getStringExtra("ALBUM");
+        String image = intent.getStringExtra("IMAGE");
+        Toast.makeText(this,"Song playing is "+song+ " "+album+ " " ,Toast.LENGTH_SHORT).show();*/
+
         mediaPlayer=MediaPlayer.create(this, R.raw.a);
         if(method.equals(METHOD_PLAY))
         {
+            mediaPlayer=MediaPlayer.create(this, R.raw.a);
+            EventBus.getDefault().post(new MusicPlayEvent(mediaPlayer.getDuration()));
             startMusic();
+
         }
         if(method.equals(METHOD_PAUSE))
         {
@@ -71,11 +82,12 @@ public class MusicServices extends Service{
 
     // Methods of Media Player
 
+
+
     public static void startMusic(){
 
         if(mediaPlayer!=null) {
             mediaPlayer.start();
-            EventBus.getDefault().post(new SeekbarUpdateEvent());
 
         }
     }
@@ -132,6 +144,13 @@ public class MusicServices extends Service{
         return this.songName();
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

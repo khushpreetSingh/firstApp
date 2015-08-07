@@ -9,17 +9,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.novopay.khushpreetsingh.mymusic.Models.MusicApiResponse;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import Events.MusicCompletedEvent;
+import Events.MusicPlayEvent;
 import Events.SeekbarUpdateEvent;
 import de.greenrobot.event.EventBus;
 import hugo.weaving.DebugLog;
@@ -30,15 +33,16 @@ public class MusicActivity extends ActionBarActivity {
     private Button mPlayButton, mPauseButton,mFastForward,mRewind;
     private MediaPlayer mediaPlayer;
     private SeekBar mSeek;
+    MusicHandler musicHandler=new MusicHandler();
     private TextView mSongName, mArtistName;
     public int music_current_position;
     public static int POS;
+    public ImageView image;
 
     //******
     public static int MESSAGE_WAKE_UP=10;
     // *******
 
-    MusicHandler musicHandler = new MusicHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,18 +55,32 @@ public class MusicActivity extends ActionBarActivity {
         mPauseButton.setVisibility(View.VISIBLE);
         mFastForward = (Button) findViewById(R.id.activity_main_fastforward);
         mRewind = (Button) findViewById(R.id.activity_main_rewind);
-        //music_current_position = MusicServices.getCurrentPosition();
         mSeek = (SeekBar) findViewById(R.id.activity_main_seek);
         mSongName = (TextView) findViewById(R.id.main_songName);
         mArtistName = (TextView) findViewById(R.id.main_artistName);
+        image = (ImageView) findViewById(R.id.display_image);
 
-        Intent intent = getIntent();
+
+        // **************
+
+        mSeek=(SeekBar) findViewById(R.id.activity_main_seek);
+        image=(ImageView) findViewById(R.id.activity_main_seek);
+        Picasso.with(MusicActivity.this).load("http://loremflickr.com/320/240").into(image);
+        //starts playing on click
+        //MusicService.playMusic();
+        Intent intent=new Intent(MusicActivity.this, MusicServices.class);
+        intent.putExtra(MusicServices.KEY_METHOD, MusicServices.METHOD_PLAY);
+        startService(intent);
+
+        /* Intent intent = getIntent();
         if(intent!=null) {
             MusicApiResponse musicResponse = (MusicApiResponse) intent.getSerializableExtra("MUSICLIST");
-            POS = (int) intent.getLongExtra("POS" ,-1);
+            POS = intent.getIntExtra("POS",-1);
             mSongName.setText(musicResponse.getResults().getCollection1().get(POS).getSongName().getText());
-
-        }
+            Picasso.with(this).
+                    load(musicResponse.getResults().getCollection1().get(POS).getImageUrl().getSrc())
+                    .into(image);
+        } */
         if(MusicServices.isMusicPlaying())
             musicHandler.sendEmptyMessage(MESSAGE_WAKE_UP);
 
@@ -186,6 +204,7 @@ public class MusicActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -194,6 +213,14 @@ public class MusicActivity extends ActionBarActivity {
         mPlayButton.setVisibility(View.VISIBLE);
         mPauseButton.setVisibility(View.INVISIBLE);
     };
+
+    @DebugLog
+    public void onEvent(MusicPlayEvent event){
+        mPlayButton.setVisibility(View.INVISIBLE);
+        mPauseButton.setVisibility(View.VISIBLE);
+        mSeek.setMax(event.duration);
+        musicHandler.sendEmptyMessage(MESSAGE_WAKE_UP);
+    }
 
     @DebugLog
     public void onEvent(SeekbarUpdateEvent event){

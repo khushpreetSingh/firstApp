@@ -20,7 +20,7 @@ public class MusicSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     public interface TableMusic{
-        String IMAGE_URL = "imageturl";
+        String IMAGE_URL = "imageurl";
         String ALBUM = "album";
         String ARTIST_NAME = "artistname";
         String SONG = "song";
@@ -30,18 +30,18 @@ public class MusicSQLiteOpenHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
-    final String CREATE_TABLE_MUSIC = "creat table" + Tables.MUSIC + "("
-            + BaseColumns._ID +  "INTEGER PRIMARY KEY AUTOINCREMENT,"
+    final String CREATE_TABLE_MUSIC = "create table " + Tables.MUSIC + " ("
+            + BaseColumns._ID +  " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + TableMusic.IMAGE_URL + " TEXT NOT NULL,"
-            + TableMusic.ALBUM + "TEXT NOT NULL"
-            + TableMusic.ARTIST_NAME + "TEXT NOT NULL"
-            + TableMusic.SONG + "TEXT NOT NULL);";
+            + TableMusic.ALBUM + " TEXT NOT NULL, "
+            + TableMusic.ARTIST_NAME + "TEXT,"
+            + TableMusic.SONG + " TEXT NOT NULL);";
 
-    final String PUT_DATA = "insert into " + Tables.MUSIC + " values(\"song1\",\"Album1\",\"Artist1\",\"pic1\")";
-    final String PUT_DATA2 = "insert into " + Tables.MUSIC + " values(\"song2\",\"Album2\",\"Artist2\",\"pic2\")";
-    final String PUT_DATA3 = "insert into " + Tables.MUSIC + " values(\"song3\",\"Album3\",\"Artist3\",\"pic3\")";
-    final String PUT_DATA4 = "insert into " + Tables.MUSIC + " values(\"song4\",\"Album4\",\"Artist4\",\"pic4\")";
-    final String PUT_DATA5 = "insert into " + Tables.MUSIC + " values(\"song5\",\"Album5\",\"Artist5\",\"pic5\")";
+    final String PUT_DATA = "insert into " + Tables.MUSIC + " values(1,\"pic1\",\"Album1\",\"Artist1\",\"song1\")";
+    final String PUT_DATA2 = "insert into " + Tables.MUSIC + " values(2,\"pic2\",\"Album2\",\"Artist2\",\"song2\")";
+    final String PUT_DATA3 = "insert into " + Tables.MUSIC + " values(3,\"pic3\",\"Album3\",\"Artist3\",\"song3\")";
+    final String PUT_DATA4 = "insert into " + Tables.MUSIC + " values(4,\"pic4\",\"Album4\",\"Artist4\",\"song4\")";
+    final String PUT_DATA5 = "insert into " + Tables.MUSIC + " values(5,\"pic5\",\"Album5\",\"Artist5\",\"song5\")";
 
     @Override
     public void onCreate(SQLiteDatabase db) {

@@ -28,6 +28,8 @@ public class MusicAPI {
 
     public interface MusicInterface{
         @GET("/4fa3g2ku?apikey=K1ZY5s3LrzsuCwWwsHt4LrEuQEjYobqi")
+        MusicApiResponse getMusicList();
+        @GET("/4fa3g2ku?apikey=K1ZY5s3LrzsuCwWwsHt4LrEuQEjYobqi")
         void getMusicList(retrofit.Callback<MusicApiResponse> musicApiResponse);
 
     }
